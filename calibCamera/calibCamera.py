@@ -8,7 +8,7 @@ import glob
 # frameSize = (1440, 1080) # pixel of cameras
 
 chessboardSize = (15, 9)
-frameSize = (1920, 1200) # pixel of cameras
+frameSize = (1300, 1000) # pixel of cameras
 
 # termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)

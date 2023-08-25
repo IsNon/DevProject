@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 import serial
 
-ser = serial.Serial('COM3', 115200)
+# ser = serial.Serial('COM3', 115200)
 
 
 n = 0
@@ -36,7 +36,7 @@ def nothing(x):
         pass
 
 cv.namedWindow("namespace")
-cv.createTrackbar("a", "namespace", 0, 255, nothing)
+cv.createTrackbar("a", "namespace", 120, 255, nothing)
 
 
 CHECK_DIR = os.path.isdir(pathSaveImage)
@@ -66,7 +66,7 @@ def isCheckDirection(position):
 
 def transmitData(direction, position):
     value = bytes('{} {}\n'.format(direction, position), encoding= 'utf8')
-    ser.write(value)
+    # ser.write(value)
 
 
 def calibInputImage(img, cameraMatrix, Distortion_Parameters, path, id):
@@ -160,20 +160,19 @@ def saveImage(drawframe, img, threshold, path, takeImage = False):
                 cv.putText(drawframe, 'CX= {} CY= {}'.format(CX , CY), (CX , CY), cv.FONT_HERSHEY_COMPLEX, 1, 255, 2)
                 # print("value coordinates= ", CX , CY)
 
-                if cv.contourArea(contour)>10000:
-                    if takeImage == True:
-                        if CX < int(img.shape[1]/2) + 30 and CX > int(img.shape[1]/2) - 30:
-                            id += 1
-                            cv.imwrite('{}\image_{}_original.jpg'.format(path, id), img)
-                            # cv.imwrite('{}\image_{}_threshold.jpg'.format(path, id), threshold)
-                            print("image saved")
+                if cv.contourArea(contour) > 10000 and takeImage == True:
+                    if CX < int(img.shape[1]/2) + 30 and CX > int(img.shape[1]/2) - 30:
+                        id += 1
+                        cv.imwrite('{}\image_{}_original.jpg'.format(path, id), img)
+                        # cv.imwrite('{}\image_{}_threshold.jpg'.format(path, id), threshold)
+                        print("image saved")
 
-                            time.sleep(0.2)
+                        time.sleep(0.2)
 
-                            readImage = cv.imread('{}\image_{}_original.jpg'.format(path, id))     
-                            processImage(readImage, path, id, True)
-                            # outimage= calibInputImage(readImage, cameraMatrix, Distortion_Parameters, path, id)
-                            # processImage(outimage, path, id, True)
+                        readImage = cv.imread('{}\image_{}_original.jpg'.format(path, id))     
+                        processImage(readImage, path, id, True)
+                        # outimage= calibInputImage(readImage, cameraMatrix, Distortion_Parameters, path, id)
+                        # processImage(outimage, path, id, True)
 
     except:
         pass
@@ -453,7 +452,7 @@ def parameterCalib():
 
 
 
-backSub = cv.createBackgroundSubtractorKNN()
+backSub = cv.createBackgroundSubtractorKNN(detectShadows= False)
 
 # conecting to the first available camera
 camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
@@ -481,7 +480,8 @@ while camera.IsGrabbing():
         # ORIIMG = img.copy()
 
         # pylonFrame = calibPylon(cameraMatrix, Distortion_Parameters, img)    
-
+        # img = img[200:800, 0:1920]
+        
         pureImg = img.copy()
         pureImg2 = img.copy()
         madeImg= img.copy()
@@ -496,7 +496,7 @@ while camera.IsGrabbing():
         determineLocateLine(madeImg)
 
         #           take a picture          #
-        saveImage(madeImg, originalImgshow, maskImage, pathSaveImage, True)
+        saveImage(madeImg, originalImgshow, maskImage, pathSaveImage, False)
 
 
 
@@ -535,7 +535,7 @@ while camera.IsGrabbing():
 
         cv.imshow('namespace', mergeImg)
         cv.imshow('show', subMergeImage)
-        # cv.imshow('background frame', mergeKNN)
+        cv.imshow('background frame', mergeKNN)
         # cv.imshow('back and belly', BBImage)
 
 
